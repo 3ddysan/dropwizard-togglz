@@ -28,12 +28,12 @@ public abstract class AbstractFeatureToggleBundle<T extends Configuration> imple
     public void run(final T configuration, final Environment environment) throws Exception {
         final FeatureToggleConfig config = getBundleConfiguration(configuration);
         final FeatureManager fm = buildFeatureManager(config);
-        overrideFeatureStatesFromConfig(fm, config);
+        overrideFeatureStatesFromConfig(fm, config.getFeatures());
         FeatureToggleProvider.bind(fm);
         addServlet(config, environment);
     }
 
-    private void addServlet(final FeatureToggleConfig configuration, final Environment environment) {
+    void addServlet(final FeatureToggleConfig configuration, final Environment environment) {
         final ServletRegistration.Dynamic servletRegistration;
         if(configuration.isServletContextAdmin()) {
             servletRegistration = environment.admin().addServlet(configuration.getServletName(), TogglzConsoleServlet.class);
@@ -43,8 +43,8 @@ public abstract class AbstractFeatureToggleBundle<T extends Configuration> imple
         servletRegistration.addMapping(configuration.getServletURLMapping());
     }
 
-    private void overrideFeatureStatesFromConfig(final FeatureManager fm, final FeatureToggleConfig config) {
-        for(Map.Entry<String, Boolean> feature : config.getFeatures().entrySet()) {
+    void overrideFeatureStatesFromConfig(final FeatureManager fm, final Map<String, Boolean> features) {
+        for(Map.Entry<String, Boolean> feature : features.entrySet()) {
             fm.setFeatureState(new FeatureState(new Feature() {
                 public String name() {
                     return feature.getKey();
@@ -53,7 +53,7 @@ public abstract class AbstractFeatureToggleBundle<T extends Configuration> imple
         }
     }
 
-    protected FeatureManager buildFeatureManager(final FeatureToggleConfig config) {
+    FeatureManager buildFeatureManager(final FeatureToggleConfig config) {
         return new FeatureManagerBuilder()
                 .stateRepository(new InMemoryStateRepository())
                 .featureEnum(config.getFeatureSpec())

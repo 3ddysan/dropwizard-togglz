@@ -19,12 +19,16 @@ ext {
     dropwizardVersion = "1.0.0"
     togglzVersion = "2.3.0.Final"
     assertjVersion = "3.5.2"
-    jersyTestVersion = "2.23.2"
+    junitVersion = "4.12"
+    mockitoVersion = "2.1.0-RC.1"
 }
 
 dependencies {
     compile "io.dropwizard:dropwizard-core:$dropwizardVersion"
+    compile "io.dropwizard:dropwizard-auth:$dropwizardVersion"
     compile "org.togglz:togglz-servlet:$togglzVersion"
     compile "org.togglz:togglz-console:$togglzVersion"
+    compile "org.mockito:mockito-core:$mockitoVersion"
     testCompile "org.assertj:assertj-core:$assertjVersion"
+    testCompile "junit:junit:$junitVersion"
 }
