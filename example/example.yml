@@ -1,0 +1,13 @@
+server:
+  type: simple
+  applicationContextPath: /application
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: 8000
+
+togglz:
+  spec: "edu.thinktank.togglz.example.Feature"
+  features:
+    FEATURE_ONE: true
+    FEATURE_TWO: false
