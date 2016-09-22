@@ -3,6 +3,7 @@ package edu.thinktank.togglz;
 import io.dropwizard.Configuration;
 import io.dropwizard.jetty.setup.ServletEnvironment;
 import io.dropwizard.setup.AdminEnvironment;
+import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.junit.Test;
 import org.togglz.console.TogglzConsoleServlet;
@@ -29,7 +30,7 @@ public class AbstractFeatureToggleBundleTest {
 
         final FeatureManager featureManager = featureToggleBundle.buildFeatureManager(featureToggleConfig);
 
-        assertThat(featureManager.getFeatures()).isEmpty();
+        assertThat(featureManager.getFeatures()).contains(TestFeature.TEST_FEATURE);
         assertThat(featureManager.getCurrentFeatureUser().getName()).isEqualTo("admin");
         assertThat(featureManager.getCurrentFeatureUser().isFeatureAdmin()).isTrue();
     }
@@ -98,6 +99,14 @@ public class AbstractFeatureToggleBundleTest {
         final AbstractFeatureToggleBundle<Configuration> bundle = createDefaultBundle(null, null);
 
         assertThat(bundle.getStateRepository()).isInstanceOf(InMemoryStateRepository.class);
+    }
+
+    @Test
+    public void initMethodShouldDoNothing() throws Exception {
+        final AbstractFeatureToggleBundle<Configuration> defaultBundle = createDefaultBundle(null, null);
+        Bootstrap<Configuration> bootstrapMock = mock(Bootstrap.class);
+        defaultBundle.initialize(bootstrapMock);
+        verifyZeroInteractions(bootstrapMock);
     }
 
     private AbstractFeatureToggleBundle<Configuration> createDefaultBundle(final FeatureToggleConfig featureToggleConfig, final StateRepository stateRepository) {

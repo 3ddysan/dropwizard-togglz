@@ -41,7 +41,7 @@ public class FeatureToggleProviderTest {
     }
 
     @Test
-    public void bindOnlyOunceManager() throws Exception {
+    public void bindOnlyOnceManager() throws Exception {
         final FeatureManager fm = new LazyResolvingFeatureManager();
         final FeatureManager fm2 = new LazyResolvingFeatureManager();
         FeatureToggleProvider.bind(fm);
@@ -51,4 +51,10 @@ public class FeatureToggleProviderTest {
         assertThat(new FeatureToggleProvider().getFeatureManager()).isEqualTo(fm);
     }
 
+    @Test
+    public void defaultPriority() throws Exception {
+        final FeatureToggleProvider featureToggleProvider = new FeatureToggleProvider();
+
+        assertThat(featureToggleProvider.priority()).isEqualTo(10);
+    }
 }

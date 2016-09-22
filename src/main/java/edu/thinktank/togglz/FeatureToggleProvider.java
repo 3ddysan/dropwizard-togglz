@@ -5,7 +5,7 @@ import org.togglz.core.spi.FeatureManagerProvider;
 
 public class FeatureToggleProvider implements FeatureManagerProvider {
 
-    private static final int DEFAULT_PRIORITY = 0;
+    private static final int DEFAULT_PRIORITY = 10;
     private static FeatureManager featureManager;
 
     public static void bind(final FeatureManager fm) {
