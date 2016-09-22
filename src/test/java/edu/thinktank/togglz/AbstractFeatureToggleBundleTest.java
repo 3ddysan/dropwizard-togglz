@@ -10,18 +10,14 @@ import org.togglz.core.Feature;
 import org.togglz.core.manager.FeatureManager;
 import org.togglz.core.manager.FeatureManagerBuilder;
 import org.togglz.core.repository.FeatureState;
+import org.togglz.core.repository.StateRepository;
 import org.togglz.core.repository.mem.InMemoryStateRepository;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.*;
 
 public class AbstractFeatureToggleBundleTest {
 
@@ -29,7 +25,7 @@ public class AbstractFeatureToggleBundleTest {
     public void buildFeatureManager() throws Exception {
         final FeatureToggleConfig featureToggleConfig = new FeatureToggleConfig();
         featureToggleConfig.setFeatureSpec(TestFeature.class.getCanonicalName());
-        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null);
+        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null, null);
 
         final FeatureManager featureManager = featureToggleBundle.buildFeatureManager(featureToggleConfig);
 
@@ -41,14 +37,14 @@ public class AbstractFeatureToggleBundleTest {
     @Test(expected = IllegalArgumentException.class)
     public void missingFeatureSpecWillThrowExceptionWhileBuildingFeatureManager() throws Exception {
         final FeatureToggleConfig featureToggleConfig = new FeatureToggleConfig();
-        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null);
+        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null, null);
 
         final FeatureManager featureManager = featureToggleBundle.buildFeatureManager(featureToggleConfig);
     }
 
     @Test
     public void overrideFeatureSettings() throws Exception {
-        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null);
+        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null, null);
         final InMemoryStateRepository stateRepository = new InMemoryStateRepository();
         final Feature feature = new Feature() {
             public String name() {
@@ -72,7 +68,7 @@ public class AbstractFeatureToggleBundleTest {
         final Environment environment = mock(Environment.class);
         final AdminEnvironment admin = mock(AdminEnvironment.class, RETURNS_DEEP_STUBS);
         when(environment.admin()).thenReturn(admin);
-        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null);
+        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null, null);
 
         featureToggleBundle.addServlet(new FeatureToggleConfig(), environment);
 
@@ -86,7 +82,7 @@ public class AbstractFeatureToggleBundleTest {
         when(environment.admin()).thenReturn(adminMock);
         final ServletEnvironment servletMock = mock(ServletEnvironment.class, RETURNS_DEEP_STUBS);
         when(environment.servlets()).thenReturn(servletMock);
-        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null);
+        final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null, null);
 
         final FeatureToggleConfig config = spy(new FeatureToggleConfig());
         when(config.isServletContextAdmin()).thenReturn(false);
@@ -97,11 +93,23 @@ public class AbstractFeatureToggleBundleTest {
         verify(servletMock).addServlet("togglz", TogglzConsoleServlet.class);
     }
 
-    private AbstractFeatureToggleBundle<Configuration> createDefaultBundle(final FeatureToggleConfig featureToggleConfig) {
+    @Test
+    public void defaultStateRepositoryShouldBeInMemmory() throws Exception {
+        final AbstractFeatureToggleBundle<Configuration> bundle = createDefaultBundle(null, null);
+
+        assertThat(bundle.getStateRepository()).isInstanceOf(InMemoryStateRepository.class);
+    }
+
+    private AbstractFeatureToggleBundle<Configuration> createDefaultBundle(final FeatureToggleConfig featureToggleConfig, final StateRepository stateRepository) {
         return new AbstractFeatureToggleBundle<Configuration>() {
             @Override
             public FeatureToggleConfig getBundleConfiguration(final Configuration configuration) {
                 return featureToggleConfig;
+            }
+
+            @Override
+            public StateRepository getStateRepository() {
+                return stateRepository != null ? stateRepository : super.getStateRepository();
             }
         };
     }

@@ -34,5 +34,5 @@ Enable/Disable feature at runtime via admin console
 http://localhost:8080/admin/togglz/
 
 ## Todo
-- [ ] persist toggles
+- [x] ~~persist toggles~~ StateRepository can be implemented via AbstractFeatureToggleBundle#getStateRepository
 - [ ] auth (basic)

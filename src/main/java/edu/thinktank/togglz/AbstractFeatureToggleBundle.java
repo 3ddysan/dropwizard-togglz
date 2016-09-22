@@ -9,7 +9,6 @@ import org.togglz.core.Feature;
 import org.togglz.core.manager.FeatureManager;
 import org.togglz.core.manager.FeatureManagerBuilder;
 import org.togglz.core.repository.FeatureState;
-import org.togglz.core.repository.mem.InMemoryStateRepository;
 import org.togglz.core.user.FeatureUser;
 import org.togglz.core.user.SimpleFeatureUser;
 import org.togglz.core.user.UserProvider;
@@ -17,7 +16,7 @@ import org.togglz.core.user.UserProvider;
 import javax.servlet.ServletRegistration;
 import java.util.Map;
 
-public abstract class AbstractFeatureToggleBundle<T extends Configuration> implements ConfiguredBundle<T> {
+public abstract class AbstractFeatureToggleBundle<T extends Configuration> implements ConfiguredBundle<T>, StateRepositoryProvider {
 
     public abstract FeatureToggleConfig getBundleConfiguration(final T configuration);
 
@@ -55,7 +54,7 @@ public abstract class AbstractFeatureToggleBundle<T extends Configuration> imple
 
     FeatureManager buildFeatureManager(final FeatureToggleConfig config) {
         return new FeatureManagerBuilder()
-                .stateRepository(new InMemoryStateRepository())
+                .stateRepository(getStateRepository())
                 .featureEnum(config.getFeatureSpec())
                 .userProvider(new UserProvider() {
                     @Override
