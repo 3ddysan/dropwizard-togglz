@@ -33,6 +33,30 @@ if(Feature.FEATURE_ONE.isActive()) {
 Enable/Disable feature at runtime via admin console
 http://localhost:8080/admin/togglz/
 
+## Testing
+FeatureToggleTestSupport class contains convenience methods for testing.
+```java
+public class ResourceTest {
+
+    @ClassRule
+    public static final ResourceTestRule resources = ResourceTestRule.builder()
+            .addResource(new Resource())
+            .build();
+
+    @Before
+    public void setupFeatures() {
+        FeatureToggleTestSupport.initAllFeatures(Feature.class, false);
+    }
+
+    @Test
+    public void testFeatureOne() throws Exception {
+        FeatureToggleTestSupport.enable(Feature.FEATURE_ONE);
+        String response = resources.client().target("/").request().get().readEntity(String.class);
+        assertThat(response).isEqualTo("feature one enabled, feature two disabled");
+    }
+}
+```
+
 ## Todo
 - [x] ~~persist toggles~~ StateRepository can be implemented via AbstractFeatureToggleBundle#getStateRepository
 - [ ] auth (basic)
