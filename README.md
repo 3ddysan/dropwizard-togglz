@@ -1,5 +1,9 @@
 # dropwizard-togglz
-Dropwizard Bundle for Feature Toggles using https://www.togglz.org/
+Dropwizard 1.0.0 Bundle for Feature Toggles using https://www.togglz.org/
+
+## Todo
+- [x] ~~persist toggles~~ StateRepository can be implemented via AbstractFeatureToggleBundle#getStateRepository
+- [ ] auth (basic)
 
 ## Example
 Create enum implementing Feature interface
@@ -57,6 +61,36 @@ public class ResourceTest {
 }
 ```
 
-## Todo
-- [x] ~~persist toggles~~ StateRepository can be implemented via AbstractFeatureToggleBundle#getStateRepository
-- [ ] auth (basic)
+
+## Persistence
+Example with [MongoDB Driver](https://mongodb.github.io/mongo-java-driver/3.3/).
+```java
+@Override
+public void initialize(final Bootstrap<Config> bootstrap) {
+    bootstrap.addBundle(new AbstractFeatureToggleBundle<Config>() {
+ 
+        public FeatureToggleConfig getBundleConfiguration(final Config configuration) {
+            return configuration.toggleConfig;
+        }
+        
+        public StateRepository getStateRepository() {
+            return new StateRepository() {
+                MongoCollection<Document> collection;
+                StateRepository() {
+                    MongoClient mongoClient = new MongoClient();
+                    MongoDatabase db = mongoClient.getDatabase("test");
+                    collection = database.getCollection("features");
+                }
+                public FeatureState getFeatureState(Feature feature) {
+                    Boolean isEnabled = collection.find(eq("name", feature.name())).first().getBoolean("enabled");
+                    return new FeatureState(feature, isEnabled);
+                }
+                public void setFeatureState(FeatureState state) {
+                    collection.insertOne(new Document("name", state.getFeature().name()).append("enabled", state.isEnabled()))
+                }
+            }
+        }
+        
+    });
+}
+```
