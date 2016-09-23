@@ -1,4 +1,5 @@
 
 dependencies {
     compile rootProject
+    testCompile "io.dropwizard:dropwizard-testing:${rootProject.dropwizardVersion}"
 }
