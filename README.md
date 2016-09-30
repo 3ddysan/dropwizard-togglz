@@ -1,6 +1,8 @@
 # dropwizard-togglz
 Dropwizard 1.0.2 Bundle for Feature Toggles using https://www.togglz.org/
 
+[![Build Status](https://travis-ci.org/3ddysan/dropwizard-togglz.svg?branch=master)](https://travis-ci.org/3ddysan/dropwizard-togglz)
+
 ## Todo
 - [x] ~~persist toggles~~ StateRepository can be implemented via AbstractFeatureToggleBundle#getStateRepository
 - [ ] auth (basic)
