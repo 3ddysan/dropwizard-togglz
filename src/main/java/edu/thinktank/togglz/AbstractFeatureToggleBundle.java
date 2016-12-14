@@ -9,6 +9,8 @@ import org.togglz.core.Feature;
 import org.togglz.core.manager.FeatureManager;
 import org.togglz.core.manager.FeatureManagerBuilder;
 import org.togglz.core.repository.FeatureState;
+import org.togglz.core.repository.StateRepository;
+import org.togglz.core.repository.mem.InMemoryStateRepository;
 import org.togglz.core.user.FeatureUser;
 import org.togglz.core.user.SimpleFeatureUser;
 import org.togglz.core.user.UserProvider;
@@ -26,8 +28,10 @@ public abstract class AbstractFeatureToggleBundle<T extends Configuration> imple
     @Override
     public void run(final T configuration, final Environment environment) throws Exception {
         final FeatureToggleConfig config = getBundleConfiguration(configuration);
-        final FeatureManager fm = buildFeatureManager(config);
-        overrideFeatureStatesFromConfig(fm, config.getFeatures());
+        final StateRepository stateRepository = getStateRepository(configuration, environment);
+        final FeatureManager fm = buildFeatureManager(config, stateRepository);
+        if(config.alwaysOverrideFeatureStates() || stateRepository instanceof InMemoryStateRepository)
+            overrideFeatureStatesFromConfig(fm, config.getFeatures());
         FeatureToggleProvider.bind(fm);
         addServlet(config, environment);
     }
@@ -52,9 +56,9 @@ public abstract class AbstractFeatureToggleBundle<T extends Configuration> imple
         }
     }
 
-    FeatureManager buildFeatureManager(final FeatureToggleConfig config) {
+    FeatureManager buildFeatureManager(final FeatureToggleConfig config, final StateRepository stateRepository) {
         return new FeatureManagerBuilder()
-                .stateRepository(getStateRepository())
+                .stateRepository(stateRepository)
                 .featureEnum(config.getFeatureSpec())
                 .userProvider(new UserProvider() {
                     @Override

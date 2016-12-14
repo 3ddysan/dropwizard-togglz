@@ -28,7 +28,7 @@ public class AbstractFeatureToggleBundleTest {
         featureToggleConfig.setFeatureSpec(TestFeature.class.getCanonicalName());
         final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null, null);
 
-        final FeatureManager featureManager = featureToggleBundle.buildFeatureManager(featureToggleConfig);
+        final FeatureManager featureManager = featureToggleBundle.buildFeatureManager(featureToggleConfig, featureToggleBundle.getStateRepository(null, null));
 
         assertThat(featureManager.getFeatures()).contains(TestFeature.TEST_FEATURE);
         assertThat(featureManager.getCurrentFeatureUser().getName()).isEqualTo("admin");
@@ -40,7 +40,7 @@ public class AbstractFeatureToggleBundleTest {
         final FeatureToggleConfig featureToggleConfig = new FeatureToggleConfig();
         final AbstractFeatureToggleBundle<Configuration> featureToggleBundle = createDefaultBundle(null, null);
 
-        final FeatureManager featureManager = featureToggleBundle.buildFeatureManager(featureToggleConfig);
+        final FeatureManager featureManager = featureToggleBundle.buildFeatureManager(featureToggleConfig, featureToggleBundle.getStateRepository(null, null));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class AbstractFeatureToggleBundleTest {
     public void defaultStateRepositoryShouldBeInMemmory() throws Exception {
         final AbstractFeatureToggleBundle<Configuration> bundle = createDefaultBundle(null, null);
 
-        assertThat(bundle.getStateRepository()).isInstanceOf(InMemoryStateRepository.class);
+        assertThat(bundle.getStateRepository(null, null)).isInstanceOf(InMemoryStateRepository.class);
     }
 
     @Test
@@ -117,8 +117,8 @@ public class AbstractFeatureToggleBundleTest {
             }
 
             @Override
-            public StateRepository getStateRepository() {
-                return stateRepository != null ? stateRepository : super.getStateRepository();
+            public StateRepository getStateRepository(Configuration configuration, Environment environment) {
+                return stateRepository != null ? stateRepository : super.getStateRepository(null, null);
             }
         };
     }

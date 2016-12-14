@@ -13,6 +13,9 @@ public class FeatureToggleConfig {
     private static final String DEFAULT_TOGGLZ_MAPPING = "/togglz/*";
     private static final String TOGGLZ_SERVLET_NAME = "togglz";
 
+    @JsonProperty("alwaysOverrideFeatureStates")
+    private Boolean alwaysOverrideFeatureStates = false;
+
     @JsonProperty("features")
     private Map<String, Boolean> features = new HashMap<>();
 
@@ -60,5 +63,9 @@ public class FeatureToggleConfig {
 
     public Map<String, Boolean> getFeatures() {
         return features;
+    }
+
+    public Boolean alwaysOverrideFeatureStates() {
+        return alwaysOverrideFeatureStates;
     }
 }
