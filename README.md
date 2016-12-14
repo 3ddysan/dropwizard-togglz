@@ -8,7 +8,7 @@ Dropwizard 1.0.2 Bundle for Feature Toggles using https://www.togglz.org/
 - [ ] auth (basic)
 
 ## Example
-Create enum implementing Feature interface
+Create enum implementing Feature interface.
 
 ```java
 public enum Feature implements org.togglz.core.Feature {
@@ -25,6 +25,7 @@ Define default config with reference to Feature enum.
 ```yaml
 togglz:
   spec: "edu.thinktank.togglz.example.Feature"
+  alwaysOverrideFeatureStates: true
   features:
     FEATURE_ONE: true
 ```
@@ -66,6 +67,11 @@ public class ResourceTest {
 
 ## Persistence
 Example with [MongoDB Driver](https://mongodb.github.io/mongo-java-driver/3.3/).
+```yaml
+togglz:
+  spec: "edu.thinktank.togglz.example.Feature"
+  alwaysOverrideFeatureStates: false
+```
 ```java
 @Override
 public void initialize(final Bootstrap<Config> bootstrap) {
@@ -75,7 +81,7 @@ public void initialize(final Bootstrap<Config> bootstrap) {
             return configuration.toggleConfig;
         }
         
-        public StateRepository getStateRepository() {
+        public StateRepository getStateRepository(final Config configuration, final Environment environment) {
             return new StateRepository() {
                 MongoCollection<Document> collection;
                 StateRepository() {
